@@ -13,7 +13,6 @@ class UserRepository {
             }
 
             $user = new User;
-            $user = $user->with(['role']);
 
             if($data->search){
                 $user->where('name', 'like', '%'.$data->search.'%');
@@ -57,10 +56,18 @@ class UserRepository {
             $create->name = $data->name;
             $create->email = $data->email;
             $create->password = bcrypt($data->password);
-            $create->id_role = $data->id_role;
+            $create->role = $data->role;
             $create->created_at = round(microtime(true));
             $create->updated_at = round(microtime(true));
             $create->save();
+
+            if(strtolower($data->role) == 'admin'){
+                $create->assignRole('admin');
+            }elseif(strtolower($data->role) == 'editor'){
+                $create->assignRole('editor');
+            }else{
+                $create->assignRole('user');
+            }
 
             if($create){
                 return response()->json([
@@ -84,7 +91,7 @@ class UserRepository {
 
     public function show($id){
         try{
-            $detail = User::where('id', $id)->with(['role'])->first();
+            $detail = User::where('id', $id)->first();
 
             if($detail){
                 return response()->json([
@@ -116,9 +123,17 @@ class UserRepository {
                 $update->password = bcrypt($data->password);
             }
 
-            $update->id_role = $data->id_role;
+            $update->role = $data->role;
             $update->updated_at = round(microtime(true));
             $update->save();
+
+            if(strtolower($data->role) == 'admin'){
+                $user->syncRoles('admin');
+            }elseif(strtolower($data->role) == 'editor'){
+                $user->syncRoles('editor');
+            }else{
+                $user->syncRoles('user');
+            }
 
             if($update){
                 return response()->json([

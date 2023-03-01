@@ -3,6 +3,7 @@
 namespace App\Repositories\Api;
 
 use App\Models\Post;
+use App\Models\User;
 
 class PostRepository {
     public function index($data){
@@ -55,7 +56,7 @@ class PostRepository {
         try{
             $create = new Post;
             $create->title = $data->title;
-            $create->id_creator = 1; //auth('sanctum')->user()->id;
+            $create->id_creator = auth('sanctum')->user()->id;
             $create->id_category = $data->id_category;
             $create->slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $data->title)));
             $create->content = $data->content;
@@ -86,6 +87,14 @@ class PostRepository {
     public function show($id){
         try{
             $detail = Post::where('id', $id)->with(['creator', 'category'])->first();
+            $user = User::where('id', auth('sanctum')->user()->id)->first();
+
+            if($detail->id_creator != auth('sanctum')->user()->id || $user->hasAnyRole(['admin', 'editor'])){
+                return response()->json([
+                    'status' => 403,
+                    'message' => 'You do not have access to this permission'
+                ], 403);
+            }
 
             if($detail){
                 return response()->json([
@@ -110,7 +119,16 @@ class PostRepository {
 
     public function update($data){
         try{
+            $user = User::where('id', auth('sanctum')->user()->id)->first();
             $update = Post::find($data->id);
+            
+            if($update->id_creator != auth('sanctum')->user()->id || $user->hasAnyRole(['admin', 'editor'])){
+                return response()->json([
+                    'status' => 403,
+                    'message' => 'You do not have access to this permission'
+                ], 403);
+            }
+
             $update->title = $data->title;
             $update->slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $data->title)));
             $update->id_category = $data->id_category;
@@ -140,6 +158,16 @@ class PostRepository {
 
     public function destroy($id){
         try{
+            $user = User::where('id', auth('sanctum')->user()->id)->first();
+            $detail = Post::where('id', $id)->with(['creator', 'category'])->first();
+
+            if($detail->id_creator != auth('sanctum')->user()->id || $user->hasAnyRole(['admin', 'editor'])){
+                return response()->json([
+                    'status' => 403,
+                    'message' => 'You do not have access to this permission'
+                ], 403);
+            }
+
             $delete = Post::find($id)->delete();
 
             if($delete){

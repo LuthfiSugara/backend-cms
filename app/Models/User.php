@@ -8,10 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles;
 
     public $timestamps = false;
 
@@ -24,7 +25,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'id_role',
+        'role',
         'created_at',
         'updated_at',
     ];
@@ -48,7 +49,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function role(){
-        return $this->belongsTo(Role::class, 'id_role', 'id');
-    }
+    // public function role(){
+    //     return $this->belongsTo(Role::class, 'id_role', 'id');
+    // }
 }

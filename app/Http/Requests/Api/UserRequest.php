@@ -27,7 +27,7 @@ class UserRequest extends FormRequest
             'name' => 'required',
             'email' => 'required|unique:users|email:rfc,dns',
             'password' => 'required|min:6',
-            'id_role' => 'required',
+            'role' => 'required',
         ];
     }
 
@@ -40,7 +40,7 @@ class UserRequest extends FormRequest
             'email.email' => 'Wrong email format!',
             'password.required' => 'Cannot be empty!',
             'password.min' => 'Minimum 6 characters!',
-            'id_role.required' => 'Cannot be empty!',
+            'role.required' => 'Cannot be empty!',
         ];
     }
 

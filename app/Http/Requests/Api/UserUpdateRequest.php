@@ -26,7 +26,7 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => 'required',
             'password' => 'min:6',
-            'id_role' => 'required',
+            'role' => 'required',
         ];
     }
 
@@ -38,7 +38,7 @@ class UserUpdateRequest extends FormRequest
             'email.unique' => 'Email already registered!',
             'email.email' => 'Wrong email format!',
             'password.min' => 'Minimum 6 characters!',
-            'id_role.required' => 'Cannot be empty!',
+            'role.required' => 'Cannot be empty!',
         ];
     }
 
